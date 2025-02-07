@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def scrape():
+def scraper():
     url = "https://nextjs.org/docs"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -20,6 +20,8 @@ def scrape():
 
 """
   for my learning purposes:
+  importing requests from the built-in Python library
+  from Beautiful Soup (bs4) module, import the BeautifulSoup class
   the "scrape" function
     -- url is the URL for the Next.js documentation
     -- response = takes a command from the requests package library to get the URL. The url is the URL for Next.js docs
