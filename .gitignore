@@ -1,0 +1,26 @@
+# Ignore virtual environment directory
+venv/
+
+# Ignore environment variable file
+.env
+
+# Ignore docs directory where scraped content is saved
+docs/
+
+# Ignore pickle file where the index is saved
+index.pkl
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore logs and other temporary files
+*.log
+*.tmp
