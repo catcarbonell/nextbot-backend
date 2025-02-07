@@ -1,17 +1,24 @@
-from llama_index import LlamaIndex
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+import os
+import pickle
 
-def create_index(docs_content):
-  index = LlamaIndex()
-  for doc in docs_content:
-    index.add_document(doc)
+INDEX_FILE = 'index.pkl'
+
+def create_index():
+    reader = SimpleDirectoryReader('docs')
+    documents = reader.load_data()
+    index = VectorStoreIndex.from_documents(documents)
+    
+    # Store the index to a file
+    with open(INDEX_FILE, 'wb') as f:
+        pickle.dump(index, f)
+    
     return index
-  
-  """
-  from the llama_index package/module import the LlamaIndex class
-  create_index function that takes docs_content as an argument
-  index = a variable that is an instance of the LlamaIndex class
-  for loop that takes the doc in the docs_content list
-    -- index.add_document(doc) = adds the doc to the index
-      - the add_document method is a method of the LlamaIndex class
-    -- return index = returns the index to whatever calls the create_index function
-  """
+
+def load_index():
+    if os.path.exists(INDEX_FILE):
+        with open(INDEX_FILE, 'rb') as f:
+            index = pickle.load(f)
+        return index
+    else:
+        return create_index()
