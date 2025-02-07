@@ -1,4 +1,4 @@
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import SimpleDirectoryReader, GPTVectorStoreIndex
 import os
 import pickle
 
@@ -7,7 +7,7 @@ INDEX_FILE = 'index.pkl'
 def create_index():
     reader = SimpleDirectoryReader('docs')
     documents = reader.load_data()
-    index = VectorStoreIndex.from_documents(documents)
+    index = GPTVectorStoreIndex.from_documents(documents)
     
     # Store the index to a file
     with open(INDEX_FILE, 'wb') as f:

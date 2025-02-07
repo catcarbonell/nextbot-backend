@@ -1,50 +1,56 @@
-import openai
-from dotenv import load_dotenv
 import os
 import time
 from cachetools import TTLCache
-from llama_index import VectorStoreIndex
-
-# Load environment variables from .env file
+from llama_index.core import GPTVectorStoreIndex
+from dotenv import load_dotenv
+from openai import OpenAI
 load_dotenv()
+OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 
-# Retrieve the OpenAI API key from environment variables
-openai.api_key = os.getenv('OPENAI_API_KEY')
+
+
+client = OpenAI()
 
 # Create a cache with a TTL of 1 hour and a max size of 100 entries
 cache = TTLCache(maxsize=100, ttl=3600)
 last_request_time = 0
 
 def query_index(index, query):
-    results = index.search(query)
+    # Use the query method appropriate for the GPTVectorStoreIndex
+    retriever = index.as_retriever()
+    results = retriever.retrieve(query)
     return results
 
-def ask_openai(query):
+def ask_openai(prompt):
     global last_request_time
-    
+
+    prompt_key = str(prompt)
+
     # Check the cache first
-    if query in cache:
-        return cache[query]
-    
+    if prompt_key in cache:
+        return cache[prompt_key]
+
     # Rate limiting: ensure at least 1 second between requests
     current_time = time.time()
     if current_time - last_request_time < 1:
         time.sleep(1 - (current_time - last_request_time))
-    
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=query,
-        max_tokens=150
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": prompt_key}
+            ]
     )
-    last_request_time = current_time
     
-    # Cache the response and return it
-    answer = response.choices[0].text.strip()
-    cache[query] = answer
+    last_request_time = current_time
+
+    # Cache the response and return its
+    answer = response.choices[0].message.content
+    cache[prompt_key] = answer
     return answer
 
 class LlamaIndexAgent:
-    def __init__(self, index: VectorStoreIndex):
+    def __init__(self, index: GPTVectorStoreIndex):
         self.index = index
 
     def handle_query(self, query: str):
