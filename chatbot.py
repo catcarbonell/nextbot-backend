@@ -1,22 +1,18 @@
 import os
 import time
 from cachetools import TTLCache
-from llama_index.core import GPTVectorStoreIndex
+from llama_index.core import VectorStoreIndex
 from dotenv import load_dotenv
 from openai import OpenAI
 load_dotenv()
 OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 
-
-
 client = OpenAI()
 
-# Create a cache with a TTL of 1 hour and a max size of 100 entries
 cache = TTLCache(maxsize=100, ttl=3600)
 last_request_time = 0
 
 def query_index(index, query):
-    # Use the query method appropriate for the GPTVectorStoreIndex
     retriever = index.as_retriever()
     results = retriever.retrieve(query)
     return results
@@ -48,9 +44,8 @@ def ask_openai(prompt):
     answer = response.choices[0].message.content
     cache[prompt_key] = answer
     return answer
-
 class LlamaIndexAgent:
-    def __init__(self, index: GPTVectorStoreIndex):
+    def __init__(self, index: VectorStoreIndex):
         self.index = index
 
     def handle_query(self, query: str):
